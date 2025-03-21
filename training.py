@@ -114,21 +114,39 @@ for e in range(n_epochs):
 
         del motions, texts, lengths, dist_T, dist_M, epsilon_T, epsilon_M, mu_T, mu_M, std_T, std_M, z_T, z_M, H_hat_T, H_hat_M
 
-    # Validation
+     # Validation
     with torch.no_grad():
         total_loss = 0
-        for i, (texts, motions) in enumerate(val_dataloader):
-            texts = texts.to(device)
+        for i, (motions, lengths, texts) in enumerate(val_dataloader):
+            # Move validation data to device
             motions = motions.to(device)
-            print(texts.size())
-            print(motions.size())
-            exit()
-            z = motion_encoder(motions)
-            z_text = text_encoder(texts)
+            texts = texts.to(device)
+            lengths = lengths.to(device)
 
-            output = motion_decoder(z, z_text)
+            # Forward pass for validation
+            dist_T = text_encoder(texts)
+            dist_M = motion_encoder(motions, lengths)
 
-            loss = torch.nn.functional.mse_loss(output, motions)
+            # Reparameterization trick for validation
+            epsilon_T = torch.randn_like(dist_T.mean)
+            epsilon_M = torch.randn_like(dist_M.mean)
+
+            mu_T = dist_T.mean
+            mu_M = dist_M.mean
+
+            std_T = dist_T.stddev
+            std_M = dist_M.stddev
+
+            z_T = mu_T + std_T * epsilon_T
+            z_M = mu_M + std_M * epsilon_M
+
+            H_hat_T = motion_decoder(z_T, lengths)
+            H_hat_M = motion_decoder(z_M, lengths)
+
+            # Calculate validation loss
+            loss = loss_function(mu_T, std_M, mu_M, std_M, z_T, z_M, motions, H_hat_M, H_hat_T)
             total_loss += loss.item()
+
+            del motions, texts, lengths, dist_T, dist_M, epsilon_T, epsilon_M, mu_T, mu_M, std_T, std_M, z_T, z_M, H_hat_T, H_hat_M
 
         print(f"Epoch {e}, validation loss: {total_loss / len(val_dataloader)}")
