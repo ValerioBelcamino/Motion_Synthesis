@@ -38,28 +38,28 @@ fnames = [f.split('.')[0] for f in os.listdir(motionpath)]
 # Let's split in train and test
 
 # First, split into train (80%) and temp (20%) (test + validation)
-train_set, temp_set = train_test_split(fnames, test_size=0.4, random_state=42)
+train_set, val_set = train_test_split(fnames, test_size=0.3, random_state=42)
 
 # Then split temp into validation (10%) and test (10%)
-val_set, test_set = train_test_split(temp_set, test_size=0.6, random_state=42)
+# val_set, test_set = train_test_split(temp_set, test_size=0.6, random_state=42)
 
 print("Train:", len(train_set))
 print("Validation:", len(val_set))
-print("Test:", len(test_set))
+# print("Test:", len(test_set))
 
 
 train_dataset = TensorTextDataset(train_set, basepath, 6361)
 val_dataset = TensorTextDataset(val_set, basepath, 6361)
-test_dataset = TensorTextDataset(test_set, basepath, 6361)
+# test_dataset = TensorTextDataset(test_set, basepath, 6361)
 
 print("Train dataset:", len(train_dataset))
 print("Validation dataset:", len(val_dataset))
-print("Test dataset:", len(test_dataset))
+# print("Test dataset:", len(test_dataset))
 
 # Dataloaders
 train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_fn)
 val_dataloader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_fn)
-test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_fn)
+# test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_fn)
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 

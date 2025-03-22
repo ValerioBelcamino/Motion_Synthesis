@@ -15,7 +15,7 @@ def lengths_to_mask(lengths: List[int], device: torch.device) -> Tensor:
     return mask
 
 class MotionDecoder(pl.LightningModule):
-    def __init__(self, nfeats: int,
+    def __init__(self, nfeats: int, max_len: int,
                  latent_dim: int = 256, ff_size: int = 1024,
                  num_layers: int = 4, num_heads: int = 4,
                  dropout: float = 0.1,
@@ -26,7 +26,7 @@ class MotionDecoder(pl.LightningModule):
 
         output_feats = nfeats
 
-        self.sequence_pos_encoding = PositionalEncoding(latent_dim, dropout)
+        self.sequence_pos_encoding = PositionalEncoding(latent_dim, dropout, max_len=max_len)
 
         seq_trans_decoder_layer = nn.TransformerDecoderLayer(d_model=latent_dim,
                                                              nhead=num_heads,
