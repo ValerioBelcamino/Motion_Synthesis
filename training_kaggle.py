@@ -17,7 +17,7 @@ learning_rate = 1e-4
 n_epochs = 100
 batch_size = 4
 
-n_features = 315
+n_features = 135
 
 ##########################
 
