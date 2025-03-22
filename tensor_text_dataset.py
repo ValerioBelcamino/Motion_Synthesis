@@ -21,8 +21,10 @@ class TensorTextDataset(Dataset):
         motion = torch.load(path)
         motion = motion.squeeze(0)  # Remove the first dimension
 
+        motion[:,:3] = motion[:,:3] / 100.0
+
         current_size = motion.shape[0]
-        pad_amount = self.max_length_motion - current_size  # Only pad along dimension 1
+        # pad_amount = self.max_length_motion - current_size  # Only pad along dimension 1
 
         # Apply padding (pad last dimension first)
         # padded_motion = F.pad(motion, (0, 0, 0, pad_amount))  # (left, right, top, bottom)

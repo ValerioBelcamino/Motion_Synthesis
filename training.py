@@ -13,9 +13,9 @@ import torch
 
 ####### PARAMETERS #######
 
-learning_rate = 1e-5
+learning_rate = 1e-4
 n_epochs = 100
-batch_size = 8
+batch_size = 4
 
 n_features = 315
 
@@ -63,13 +63,14 @@ print('Created text encoder')
 motion_decoder = MotionDecoder(n_features, max_len=6363).to(device)
 print('Created motion decoder\n')
 
-optimizer = torch.optim.Adam(list(motion_encoder.parameters()) +
+optimizer = torch.optim.AdamW(list(motion_encoder.parameters()) +
                              list(text_encoder.parameters()) +
                              list(motion_decoder.parameters()), lr=learning_rate)
 
 loss_function = CrossModalLosses()
 
 for e in range(n_epochs):
+    total_train_loss = 0
     for i, (motions, lengths, texts) in enumerate(train_dataloader):
         texts = texts
         motions = motions.to(device)
@@ -105,18 +106,19 @@ for e in range(n_epochs):
         H_hat_T = motion_decoder(z_T, lengths)
         H_hat_M = motion_decoder(z_M, lengths)
 
-        loss = loss_function(mu_T, std_M, mu_M, std_M, z_T, z_M, motions, H_hat_M, H_hat_T)
+        loss = loss_function(mu_T, std_T, mu_M, std_M, z_T, z_M, motions, H_hat_M, H_hat_T)
+        total_train_loss += loss.item()
+
         loss.backward()
         optimizer.step()
 
-        if i % 10 == 0:
-            print(f"Epoch {e}, iteration {i}, loss: {loss.item()}")
-
         del motions, texts, lengths, dist_T, dist_M, epsilon_T, epsilon_M, mu_T, mu_M, std_T, std_M, z_T, z_M, H_hat_T, H_hat_M
+
+    print(f"Epoch {e} loss: {total_train_loss / len(train_dataloader)}")
 
      # Validation
     with torch.no_grad():
-        total_loss = 0
+        total_val_loss = 0
         for i, (motions, lengths, texts) in enumerate(val_dataloader):
             # Move validation data to device
             motions = motions.to(device)
@@ -144,9 +146,9 @@ for e in range(n_epochs):
             H_hat_M = motion_decoder(z_M, lengths)
 
             # Calculate validation loss
-            loss = loss_function(mu_T, std_M, mu_M, std_M, z_T, z_M, motions, H_hat_M, H_hat_T)
-            total_loss += loss.item()
+            loss = loss_function(mu_T, std_T, mu_M, std_M, z_T, z_M, motions, H_hat_M, H_hat_T)
+            total_val_loss += loss.item()
 
             del motions, texts, lengths, dist_T, dist_M, epsilon_T, epsilon_M, mu_T, mu_M, std_T, std_M, z_T, z_M, H_hat_T, H_hat_M
 
-        print(f"Epoch {e}, validation loss: {total_loss / len(val_dataloader)}")
+        print(f"Epoch {e}, validation loss: {total_val_loss / len(val_dataloader)}")

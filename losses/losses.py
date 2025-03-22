@@ -12,12 +12,12 @@ class CrossModalLosses(nn.Module):
         self.lambda_kl = lambda_kl
         self.lambda_e = lambda_e
 
-    def kl_divergence_loss(self, mu_T, logvar_T, mu_M, logvar_M):
+    def kl_divergence_loss(self, mu_T, sigma_T, mu_M, sigma_M):
         """Compute the KL divergence loss for aligning text and motion embeddings."""
         
         # Convert log-variance to standard deviation (scale)
-        sigma_T = torch.exp(0.5 * logvar_T)
-        sigma_M = torch.exp(0.5 * logvar_M)
+        # sigma_T = torch.exp(0.5 * logvar_T)
+        # sigma_M = torch.exp(0.5 * logvar_M)
         
         # Define the two distributions
         dist_T = dist.Normal(mu_T, sigma_T)
