@@ -25,8 +25,15 @@ n_features = 315
 
 
 
-basepath = '/home/belca/Desktop/Motion_Synthesis_Dataset'
+basepath = '/content/drive/My Drive/Motion_Synthesis_Dataset'
 motionpath = os.path.join(basepath, 'motion')
+
+# Checkpoint directory
+checkpoint_dir = "/content/drive/My Drive/Motion_Synthesis/checkpoints"
+os.makedirs(checkpoint_dir, exist_ok=True)
+
+# Checkpoint file path
+checkpoint_path = os.path.join(checkpoint_dir, 'best_model.pth')
 
 fnames = [f.split('.')[0] for f in os.listdir(motionpath)]
 
@@ -72,6 +79,8 @@ optimizer = torch.optim.AdamW(list(motion_encoder.parameters()) +
                              list(motion_decoder.parameters()), lr=learning_rate)
 
 loss_function = CrossModalLosses()
+
+best_loss = 10.0
 
 for e in range(n_epochs):
     total_train_loss = 0
@@ -121,7 +130,7 @@ for e in range(n_epochs):
 
         del motions, texts, lengths, dist_T, dist_M, epsilon_T, epsilon_M, mu_T, mu_M, std_T, std_M, z_T, z_M, H_hat_T, H_hat_M
 
-    print(f"Epoch {e} loss: {total_train_loss / len(train_dataloader)}")
+    print(f"\nEpoch {e} loss: {total_train_loss / len(train_dataloader)}")
 
      # Validation
     with torch.no_grad():
@@ -158,4 +167,20 @@ for e in range(n_epochs):
 
             del motions, texts, lengths, dist_T, dist_M, epsilon_T, epsilon_M, mu_T, mu_M, std_T, std_M, z_T, z_M, H_hat_T, H_hat_M
 
-        print(f"Epoch {e}, validation loss: {total_val_loss / len(val_dataloader)}")
+        avg_val_loss = total_val_loss / len(val_dataloader)
+        print(f"Epoch {e}, validation loss: {avg_val_loss}")
+
+        # Save the model checkpoint if the validation loss improves
+        if avg_val_loss < best_loss:
+            best_loss = avg_val_loss
+            print('Validation loss improved, saving checkpoint...')
+            checkpoint = {
+                'epoch': e,
+                'model_state_dict': motion_encoder.state_dict(),
+                'text_encoder_state_dict': text_encoder.state_dict(),
+                'motion_decoder_state_dict': motion_decoder.state_dict(),
+                'optimizer_state_dict': optimizer.state_dict(),
+                'loss': avg_val_loss
+            }
+            torch.save(checkpoint, checkpoint_path)
+            print(f'Checkpoint saved at epoch {e}')
