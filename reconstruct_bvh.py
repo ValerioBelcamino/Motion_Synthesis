@@ -2,6 +2,7 @@ import torch
 import pymotion.rotations.ortho6d as sixd
 import pymotion.rotations.quat as quat
 import numpy as np
+import torch.nn as nn
 
 def insert_n_frames_in_header(n_frames):
     with open('bvh_header.txt', 'r') as file:
@@ -17,16 +18,40 @@ def insert_n_frames_in_header(n_frames):
 def reconstruct_bvh(out_file_path):
 
     action_tensor = torch.load('./test_bvh/action.pt')
+    action_tensor2 = torch.load('./test_bvh/action2.pt')
 
     action_tensor = action_tensor.squeeze(0)
+    action_tensor_split1 = action_tensor[:, :18*6+3]
+    action_tensor_split2 = action_tensor[:, -19*6:-15*6]
+    action_tensor = torch.cat((action_tensor_split1, action_tensor_split2), dim=1)
+    print(action_tensor_split1)
+    print(action_tensor_split2)
+    print(action_tensor_split1.shape)
+    print(action_tensor_split2.shape)
+    print(action_tensor[0])
     print(action_tensor.shape)
+    exit()
+    print(action_tensor[:,-16*6:])
+    print(action_tensor[:,18*6 + 3 + 1: 33*6 +3])
+    print(action_tensor[:,-16*6:].shape)
+    print(action_tensor[:,18*6 + 3 + 1: 33*6 +3].shape)
+    action_tensor2 = action_tensor2.squeeze(0)[:206,:]
 
+    smooth_l1_loss_fn = nn.SmoothL1Loss(reduction='mean', beta=1)
+    loss = smooth_l1_loss_fn(action_tensor, action_tensor2)
+    print(f"{loss.item():.10f}") 
+    exit()
     positions_tensor = action_tensor[:, :3]
     print(positions_tensor.shape)
 
     # (465, 52, 3, 2)
     orientations_6d_tensor = action_tensor[:, 3:]
     print(orientations_6d_tensor.shape)
+    print(orientations_6d_tensor[0])
+    print(positions_tensor[0])
+
+    # orientations_6d_tensor = orientations_6d_tensor.to(torch.float16)
+    # print(orientations_6d_tensor[0])
     anim_length = action_tensor.shape[0]
     print(f'Animation length: {anim_length}')
 

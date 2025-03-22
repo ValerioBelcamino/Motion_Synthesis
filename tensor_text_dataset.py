@@ -21,6 +21,10 @@ class TensorTextDataset(Dataset):
         motion = torch.load(path)
         motion = motion.squeeze(0)  # Remove the first dimension
 
+        motion_split1 = motion[:, :18*6+3]
+        motion_split2 = motion[:, -19*6:-15*6]
+        motion = torch.cat((motion_split1, motion_split2), dim=1)
+
         motion[:,:3] = motion[:,:3] / 100.0
 
         current_size = motion.shape[0]
