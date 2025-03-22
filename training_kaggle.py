@@ -27,7 +27,7 @@ basepath = '/kaggle/input/motion/Motion_Synthesis_Dataset'
 motionpath = os.path.join(basepath, 'motion')
 
 # Checkpoint directory
-checkpoint_dir = "/kaggle/input/Motion_Synthesis/checkpoints"
+checkpoint_dir = "/kaggle/input/motion/Motion_Synthesis/checkpoints"
 os.makedirs(checkpoint_dir, exist_ok=True)
 
 # Checkpoint file path
@@ -131,9 +131,9 @@ for e in range(n_epochs):
         total_val_loss = 0
         for i, (motions, lengths, texts) in enumerate(val_dataloader):
             # Move validation data to device
+            texts = texts
             motions = motions.to(device)
-            texts = texts.to(device)
-            lengths = lengths.to(device)
+            lengths = lengths
 
             # Forward pass for validation
             dist_T = text_encoder(texts)

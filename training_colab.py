@@ -131,9 +131,9 @@ for e in range(n_epochs):
         total_val_loss = 0
         for i, (motions, lengths, texts) in enumerate(val_dataloader):
             # Move validation data to device
+            texts = texts
             motions = motions.to(device)
-            texts = texts.to(device)
-            lengths = lengths.to(device)
+            lengths = lengths
 
             # Forward pass for validation
             dist_T = text_encoder(texts)
