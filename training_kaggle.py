@@ -33,27 +33,7 @@ motionpath = os.path.join(basepath, 'motion')
 checkpoint_dir = "/kaggle/working/checkpoints"
 os.makedirs(checkpoint_dir, exist_ok=True)
 
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-# checkpoint_path = os.path.join(checkpoint_dir, )
-
-# # Load checkpoint if it exists
-# if os.path.exists(checkpoint_path):
-#     print("Loading checkpoint...")
-#     checkpoint = torch.load(checkpoint_path, map_location=device)
-
-#     motion_encoder.load_state_dict(checkpoint['model_state_dict'])
-#     text_encoder.load_state_dict(checkpoint['text_encoder_state_dict'])
-#     motion_decoder.load_state_dict(checkpoint['motion_decoder_state_dict'])
-#     optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-    
-#     start_epoch = checkpoint['epoch'] + 1  # Resume from next epoch
-#     best_loss = checkpoint['loss']  # Restore best validation loss
-    
-#     print(f"Checkpoint loaded. Resuming from epoch {start_epoch} with best validation loss {best_loss:.6f}")
-# else:
-#     start_epoch = 0  # Train from scratch
-#     print("No checkpoint found, starting from epoch 0")
 
 # Checkpoint file path
 checkpoint_path = os.path.join(checkpoint_dir, 'best_model.pth')
@@ -86,6 +66,7 @@ train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True
 val_dataloader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_fn)
 # test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_fn)
 
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 motion_encoder = MotionEncoder(nfeats=n_features, max_len=6363).to(device)
 print('Created motion encoder')
@@ -102,6 +83,28 @@ loss_function = CrossModalLosses()
 
 best_loss = 10.0
 
+
+# checkpoint_path = os.path.join(checkpoint_dir, )
+
+# Load checkpoint if it exists
+if os.path.exists(checkpoint_path):
+    print("Loading checkpoint...")
+    checkpoint = torch.load(checkpoint_path, map_location=device)
+
+    motion_encoder.load_state_dict(checkpoint['model_state_dict'])
+    text_encoder.load_state_dict(checkpoint['text_encoder_state_dict'])
+    motion_decoder.load_state_dict(checkpoint['motion_decoder_state_dict'])
+    optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+    
+    start_epoch = checkpoint['epoch'] + 1  # Resume from next epoch
+    best_loss = checkpoint['loss']  # Restore best validation loss
+    
+    print(f"Checkpoint loaded. Resuming from epoch {start_epoch} with best validation loss {best_loss:.6f}")
+else:
+    start_epoch = 0  # Train from scratch
+    print("No checkpoint found, starting from epoch 0")
+
+exit()
 
 for e in range(n_epochs):
     total_train_loss = 0
