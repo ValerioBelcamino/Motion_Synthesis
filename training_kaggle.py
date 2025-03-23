@@ -104,7 +104,7 @@ else:
     start_epoch = 0  # Train from scratch
     print("No checkpoint found, starting from epoch 0")
 
-exit()
+# exit()
 
 for e in range(n_epochs):
     total_train_loss = 0
