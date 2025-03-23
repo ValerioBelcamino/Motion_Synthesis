@@ -12,7 +12,7 @@ from utils.collate_function import collate_fn
 import torch 
 
 import shutil
-from google.colab import files
+
 
 ####### PARAMETERS #######
 
@@ -202,4 +202,4 @@ for e in range(n_epochs):
             }
             torch.save(checkpoint, checkpoint_path)
             print(f'Checkpoint saved at epoch {e}')
-            files.download(checkpoint_path)
+            shutil.move(checkpoint_path, "/kaggle/working/best_model.pth")
