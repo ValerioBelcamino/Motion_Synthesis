@@ -30,7 +30,7 @@ basepath = '/kaggle/input/motion/Motion_Synthesis_Dataset'
 motionpath = os.path.join(basepath, 'motion')
 
 # Checkpoint directory
-checkpoint_dir = "/kaggle/working/checkpoints"
+checkpoint_dir = "/kaggle/working/"
 os.makedirs(checkpoint_dir, exist_ok=True)
 
 
