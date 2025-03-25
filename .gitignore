@@ -1,0 +1,5 @@
+texts
+__pycache__/
+*.pt
+*.pth
+test_bvh
