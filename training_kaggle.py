@@ -18,11 +18,17 @@ import shutil
 
 learning_rate = 1e-4
 n_epochs = 100
-batch_size = 8
+batch_size = 32
 
 n_features = 135
 
 _max_len = 1800
+
+print(f'{learning_rate=}')
+print(f'{n_epochs=}')
+print(f'{batch_size=}')
+print(f'{n_features=}')
+print(f'{_max_len=}')
 
 ##########################
 

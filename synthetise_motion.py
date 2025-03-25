@@ -30,7 +30,7 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 text_encoder = TextEncoder().to(device)
 print('Created text encoder')
-motion_decoder = MotionDecoder(n_features, max_len=6363).to(device)
+motion_decoder = MotionDecoder(n_features, max_len=1800).to(device)
 print('Created motion decoder\n')
 
 checkpoint = torch.load(checkpoint_path, map_location=device)
@@ -41,7 +41,7 @@ motion_decoder.load_state_dict(checkpoint['motion_decoder_state_dict'])
 print('loaded checkpoint')
 
 # text = input('Describe the desired action:')
-text = 'a person walks'
+text = 'a person walks in circle'
 print(text)
 
 start_time = time.time()

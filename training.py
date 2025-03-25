@@ -16,11 +16,20 @@ import shutil
 
 ####### PARAMETERS #######
 
-learning_rate = 1e-4
-n_epochs = 100
+learning_rate = 0.0001
+n_epochs = 1000
 batch_size = 8
 
 n_features = 135
+
+_max_len = 1800
+
+
+print(f'{learning_rate=}')
+print(f'{n_epochs=}')
+print(f'{batch_size=}')
+print(f'{n_features=}')
+print(f'{_max_len=}')
 
 ##########################
 
@@ -67,8 +76,8 @@ print("Validation:", len(val_set))
 # print("Test:", len(test_set))
 
 
-train_dataset = TensorTextDataset(train_set, basepath, 6361)
-val_dataset = TensorTextDataset(val_set, basepath, 6361)
+train_dataset = TensorTextDataset(train_set, basepath, _max_len)
+val_dataset = TensorTextDataset(val_set, basepath, _max_len)
 # test_dataset = TensorTextDataset(test_set, basepath, 6361)
 
 print("Train dataset:", len(train_dataset))
@@ -82,11 +91,11 @@ val_dataloader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True, co
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-motion_encoder = MotionEncoder(nfeats=n_features, max_len=6363).to(device)
+motion_encoder = MotionEncoder(nfeats=n_features, max_len=_max_len).to(device)
 print('Created motion encoder')
 text_encoder = TextEncoder().to(device)
 print('Created text encoder')
-motion_decoder = MotionDecoder(n_features, max_len=6363).to(device)
+motion_decoder = MotionDecoder(n_features, max_len=_max_len).to(device)
 print('Created motion decoder\n')
 
 optimizer = torch.optim.AdamW(list(motion_encoder.parameters()) +
@@ -105,7 +114,7 @@ if os.path.exists(checkpoint_path):
     print("Loading checkpoint...")
     checkpoint = torch.load(checkpoint_path, map_location=device)
 
-    motion_encoder.load_state_dict(checkpoint['model_state_dict'])
+    motion_encoder.load_state_dict(checkpoint['motion_encoder_state_dict'])
     text_encoder.load_state_dict(checkpoint['text_encoder_state_dict'])
     motion_decoder.load_state_dict(checkpoint['motion_decoder_state_dict'])
     optimizer.load_state_dict(checkpoint['optimizer_state_dict'])

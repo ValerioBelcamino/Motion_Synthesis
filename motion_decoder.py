@@ -17,7 +17,7 @@ def lengths_to_mask(lengths: List[int], device: torch.device) -> Tensor:
 class MotionDecoder(pl.LightningModule):
     def __init__(self, nfeats: int, max_len: int,
                  latent_dim: int = 256, ff_size: int = 1024,
-                 num_layers: int = 4, num_heads: int = 4,
+                 num_layers: int = 6, num_heads: int = 6,
                  dropout: float = 0.1,
                  activation: str = "gelu", **kwargs) -> None:
 
