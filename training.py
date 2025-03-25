@@ -40,7 +40,7 @@ checkpoint_path = os.path.join(checkpoint_dir, 'best_model.pth')
 
 fnames = [f.split('.')[0] for f in os.listdir(motionpath)]
 
-print(fnames)
+# print(fnames)
 print(len(fnames))
 
 newfnames = []
