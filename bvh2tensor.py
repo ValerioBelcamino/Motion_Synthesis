@@ -75,6 +75,10 @@ for bvh in bvh_files:
 print(f'\nFound {len(bvh_with_idx)} bvh files with idx')
 print(f'Missed {len(missed)} bvh files with idx')
 
+# print(missed)
+
+# exit()
+
 
 dataset = BVHTextDataset(bvh_with_idx, descriptions, max_length=128)
 dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True)
@@ -84,11 +88,12 @@ text_length = 0
 
 start_time = time.time()
 for i, (motion, text, path) in enumerate(dataloader):
-    new_path = f'{i}_{os.path.basename(path[0]).split(".")[0]}'
+    motion = motion.squeeze(0)
+    new_path = f'{motion.shape[0]}_{i}_{os.path.basename(path[0]).split(".")[0]}'
     text = text[0]
     print(i, motion.shape, text, path)
-    if motion.shape[1] > motion_length:
-        motion_length = motion.shape[1]
+    if motion.shape[0] > motion_length:
+        motion_length = motion.shape[0]
     if len(text) > text_length:
         text_length = len(text)
     # print(motion.dtype)

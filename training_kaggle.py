@@ -40,6 +40,19 @@ checkpoint_path = os.path.join(checkpoint_dir, 'best_model.pth')
 
 fnames = [f.split('.')[0] for f in os.listdir(motionpath)]
 
+print(fnames)
+print(len(fnames))
+
+newfnames = []
+
+for f in fnames:
+    leng = int(f.split('_')[0])
+    if leng < 1800: # 1 minute at 30 fps
+        newfnames.append(f)
+
+fnames = newfnames
+print(len(fnames))
+
 # Let's split in train and test
 
 # First, split into train (80%) and temp (20%) (test + validation)
@@ -106,7 +119,7 @@ else:
 
 # exit()
 
-for e in range(n_epochs):
+for e in range(start_epoch, n_epochs):
     total_train_loss = 0
     for i, (motions, lengths, texts) in enumerate(train_dataloader):
         texts = texts
@@ -127,29 +140,20 @@ for e in range(n_epochs):
         dist_T = text_encoder(texts)
         dist_M = motion_encoder(motions, lengths)
 
-        # Reparameterization trick
-        epsilon_T = torch.randn_like(dist_T.mean)
-        epsilon_M = torch.randn_like(dist_M.mean)
-
-        mu_T = dist_T.mean
-        mu_M = dist_M.mean
-
-        std_T = dist_T.stddev
-        std_M = dist_M.stddev
-
-        z_T = mu_T + std_T * epsilon_T
-        z_M = mu_M + std_M * epsilon_M
+        z_T = dist_T.rsample()
+        z_M = dist_M.rsample()
 
         H_hat_T = motion_decoder(z_T, lengths)
         H_hat_M = motion_decoder(z_M, lengths)
 
-        loss = loss_function(mu_T, std_T, mu_M, std_M, z_T, z_M, motions, H_hat_M, H_hat_T)
+        loss = loss_function(dist_T, dist_M, z_T, z_M, motions, H_hat_T, H_hat_M)
         total_train_loss += loss.item()
 
         loss.backward()
         optimizer.step()
 
-        del motions, texts, lengths, dist_T, dist_M, epsilon_T, epsilon_M, mu_T, mu_M, std_T, std_M, z_T, z_M, H_hat_T, H_hat_M
+        # del motions, texts, lengths, dist_T, dist_M, epsilon_T, epsilon_M, mu_T, mu_M, std_T, std_M, z_T, z_M, H_hat_T, H_hat_M
+        del motions, texts, lengths, dist_T, dist_M, z_T, z_M, H_hat_T, H_hat_M
 
     print(f"Epoch {e} loss: {total_train_loss / len(train_dataloader)}")
 
@@ -166,27 +170,17 @@ for e in range(n_epochs):
             dist_T = text_encoder(texts)
             dist_M = motion_encoder(motions, lengths)
 
-            # Reparameterization trick for validation
-            epsilon_T = torch.randn_like(dist_T.mean)
-            epsilon_M = torch.randn_like(dist_M.mean)
-
-            mu_T = dist_T.mean
-            mu_M = dist_M.mean
-
-            std_T = dist_T.stddev
-            std_M = dist_M.stddev
-
-            z_T = mu_T + std_T * epsilon_T
-            z_M = mu_M + std_M * epsilon_M
+            z_T = dist_T.rsample()
+            z_M = dist_M.rsample()
 
             H_hat_T = motion_decoder(z_T, lengths)
             H_hat_M = motion_decoder(z_M, lengths)
 
             # Calculate validation loss
-            loss = loss_function(mu_T, std_T, mu_M, std_M, z_T, z_M, motions, H_hat_M, H_hat_T)
+            loss = loss_function(dist_T, dist_M, z_T, z_M, motions, H_hat_T, H_hat_M)
             total_val_loss += loss.item()
 
-            del motions, texts, lengths, dist_T, dist_M, epsilon_T, epsilon_M, mu_T, mu_M, std_T, std_M, z_T, z_M, H_hat_T, H_hat_M
+            del motions, texts, lengths, dist_T, dist_M, z_T, z_M, H_hat_T, H_hat_M
 
         avg_val_loss = total_val_loss / len(val_dataloader)
         print(f"Epoch {e}, validation loss: {avg_val_loss}")

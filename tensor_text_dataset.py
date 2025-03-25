@@ -19,13 +19,20 @@ class TensorTextDataset(Dataset):
         path = path + '.pt'
 
         motion = torch.load(path)
-        motion = motion.squeeze(0)  # Remove the first dimension
 
+        # not needed with the new version of the dataset
+        # motion = motion.squeeze(0)  # Remove the first dimension
+
+        # discard fingers since they dont move in this bvh dataset
         motion_split1 = motion[:, :18*6+3]
         motion_split2 = motion[:, -19*6:-15*6]
         motion = torch.cat((motion_split1, motion_split2), dim=1)
 
+        # scale root location to be in a smaller range
         motion[:,:3] = motion[:,:3] / 100.0
+
+        # downsample to save training time
+        motion = motion[::2,:]
 
         current_size = motion.shape[0]
         # pad_amount = self.max_length_motion - current_size  # Only pad along dimension 1
