@@ -69,7 +69,7 @@ class CrossModalLosses(nn.Module):
     #     return loss_M + loss_T
 
     def reconstruction_loss(self, H_gt, H_hat_M, H_hat_T, lengths):
-        print(lengths)
+        # print(lengths)
         lengths = torch.tensor(lengths).to('cuda')
         """Compute reconstruction loss while ignoring padded regions."""
         mask = torch.arange(H_gt.shape[1], device=H_gt.device).unsqueeze(0) < lengths.unsqueeze(1)  # (batch, time)
@@ -78,8 +78,8 @@ class CrossModalLosses(nn.Module):
         loss_M = self.smooth_l1_loss_fn(H_gt[mask], H_hat_M[mask])
         loss_T = self.smooth_l1_loss_fn(H_gt[mask], H_hat_T[mask])
 
-        print(f'{loss_M=}')
-        print(f'{loss_T=}')
+        # print(f'{loss_M=}')
+        # print(f'{loss_T=}')
 
         return loss_M + loss_T
     
@@ -102,6 +102,6 @@ class CrossModalLosses(nn.Module):
         # Total loss = L_R + λ_KL * L_KL + λ_E * L_E
         total_loss = reconstruction_loss + self.lambda_kl * kl_loss + self.lambda_e * embedding_similarity_loss
         
-        print(f'{total_loss=}\n')
+        # print(f'{total_loss=}\n')
 
         return total_loss
