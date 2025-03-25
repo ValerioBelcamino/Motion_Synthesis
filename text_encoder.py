@@ -13,7 +13,7 @@ class TextEncoder(nn.Module):
                  vae: bool = True,
                  latent_dim: int = 256,
                  ff_size: int = 1024,
-                 num_layers: int = 6, num_heads: int = 6,
+                 num_layers: int = 6, num_heads: int = 4,
                  dropout: float = 0.1,
                  activation: str = "gelu") -> None:
         super().__init__()
