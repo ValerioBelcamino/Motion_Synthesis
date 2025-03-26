@@ -17,7 +17,7 @@ import shutil
 ####### PARAMETERS #######
 
 learning_rate = 1e-4
-n_epochs = 100
+n_epochs = 1000
 batch_size = 32
 
 n_features = 135

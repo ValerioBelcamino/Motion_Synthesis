@@ -6,10 +6,6 @@ import time
 
 ####### PARAMETERS #######
 
-learning_rate = 1e-4
-n_epochs = 100
-batch_size = 8
-
 n_features = 135
 
 ##########################
