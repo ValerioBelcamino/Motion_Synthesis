@@ -177,7 +177,7 @@ for e in range(start_epoch, n_epochs):
             'text_encoder_state_dict': text_encoder.state_dict(),
             'motion_decoder_state_dict': motion_decoder.state_dict(),
             'optimizer_state_dict': optimizer.state_dict(),
-            'loss': avg_val_loss
+            'loss': avg_train_loss
         }
         torch.save(checkpoint, checkpoint_path)
         print(f'Checkpoint saved at epoch {e}')
