@@ -64,7 +64,7 @@ print(len(fnames))
 # Let's split in train and test
 
 # First, split into train (80%) and temp (20%) (test + validation)
-train_set, val_set = train_test_split(fnames, test_size=0.25, random_state=42)
+train_set, val_set = train_test_split(fnames, test_size=0.05, random_state=42)
 
 # Then split temp into validation (10%) and test (10%)
 # val_set, test_set = train_test_split(temp_set, test_size=0.6, random_state=42)
@@ -102,7 +102,8 @@ optimizer = torch.optim.AdamW(list(motion_encoder.parameters()) +
 
 loss_function = CrossModalLosses()
 
-best_loss = 10.0
+best_loss_val = 10.0
+best_loss_train = 10.0
 
 
 # checkpoint_path = os.path.join(checkpoint_dir, )
@@ -118,9 +119,9 @@ if os.path.exists(checkpoint_path):
     optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
     
     start_epoch = checkpoint['epoch'] + 1  # Resume from next epoch
-    best_loss = checkpoint['loss']  # Restore best validation loss
+    best_loss_val = checkpoint['loss']  # Restore best validation loss
     
-    print(f"Checkpoint loaded. Resuming from epoch {start_epoch} with best validation loss {best_loss:.6f}")
+    print(f"Checkpoint loaded. Resuming from epoch {start_epoch} with best validation loss {best_loss_val:.6f}")
 else:
     start_epoch = 0  # Train from scratch
     print("No checkpoint found, starting from epoch 0")
@@ -163,7 +164,24 @@ for e in range(start_epoch, n_epochs):
         # del motions, texts, lengths, dist_T, dist_M, epsilon_T, epsilon_M, mu_T, mu_M, std_T, std_M, z_T, z_M, H_hat_T, H_hat_M
         del motions, texts, lengths, dist_T, dist_M, z_T, z_M, H_hat_T, H_hat_M
 
-    print(f"Epoch {e} loss: {total_train_loss / len(train_dataloader)}")
+    avg_train_loss = total_train_loss / len(train_dataloader)
+    print(f"Epoch {e} training loss: {avg_train_loss}")
+
+    # Save the model checkpoint if the validation loss improves
+    if avg_train_loss < best_loss_train:
+        best_loss_train = avg_train_loss
+        print('Training loss improved, saving training checkpoint...')
+        checkpoint = {
+            'epoch': e,
+            'motion_encoder_state_dict': motion_encoder.state_dict(),
+            'text_encoder_state_dict': text_encoder.state_dict(),
+            'motion_decoder_state_dict': motion_decoder.state_dict(),
+            'optimizer_state_dict': optimizer.state_dict(),
+            'loss': avg_val_loss
+        }
+        torch.save(checkpoint, checkpoint_path)
+        print(f'Checkpoint saved at epoch {e}')
+        shutil.move(checkpoint_path, "/kaggle/working/best_model_train.pth")
 
      # Validation
     with torch.no_grad():
@@ -194,9 +212,9 @@ for e in range(start_epoch, n_epochs):
         print(f"Epoch {e}, validation loss: {avg_val_loss}")
 
         # Save the model checkpoint if the validation loss improves
-        if avg_val_loss < best_loss:
-            best_loss = avg_val_loss
-            print('Validation loss improved, saving checkpoint...')
+        if avg_val_loss < best_loss_val:
+            best_loss_val = avg_val_loss
+            print('Validation loss improved, saving validation checkpoint...')
             checkpoint = {
                 'epoch': e,
                 'motion_encoder_state_dict': motion_encoder.state_dict(),
@@ -208,3 +226,5 @@ for e in range(start_epoch, n_epochs):
             torch.save(checkpoint, checkpoint_path)
             print(f'Checkpoint saved at epoch {e}')
             shutil.move(checkpoint_path, "/kaggle/working/best_model.pth")
+
+    print('\n')
