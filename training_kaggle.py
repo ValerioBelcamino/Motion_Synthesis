@@ -22,7 +22,7 @@ batch_size = 32
 
 n_features = 135
 
-_max_len = 1800
+_max_len = 300
 
 print(f'{learning_rate=}')
 print(f'{n_epochs=}')
@@ -55,7 +55,7 @@ newfnames = []
 
 for f in fnames:
     leng = int(f.split('_')[0])
-    if leng < _max_len: # 1 minute at 30 fps
+    if leng < _max_len and leng > 15: # 1 minute at 30 fps
         newfnames.append(f)
 
 fnames = newfnames

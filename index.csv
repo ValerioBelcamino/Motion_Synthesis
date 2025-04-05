@@ -6514,7 +6514,7 @@ source_path,start_frame,end_frame,new_name
 ./pose_data/EyesJapanDataset/takiguchi/jump-08-rope backward-takiguchi_poses.npy,244,434,006512.npy
 ./pose_data/KIT/6/RightTurn02_1_poses.npy,0,101,006513.npy
 ./pose_data/EyesJapanDataset/hamada/pose-06-hangon-hamada_poses.npy,232,416,006514.npy
-./pose_data/SSM/20160330_03333/shake_hips_poses.npy,21,221,006515.npy
+./pose_data/SSM/20160330_03333/shake_hips_poses.npy,0,174,006515.npy
 ./pose_data/KIT/675/dry_right_arm_010_poses.npy,5,205,006516.npy
 ./pose_data/KIT/3/step_stones01_poses.npy,0,189,006517.npy
 ./pose_data/CMU/142/142_18_poses.npy,674,817,006518.npy

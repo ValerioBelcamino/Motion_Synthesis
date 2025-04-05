@@ -78,8 +78,8 @@ class CrossModalLosses(nn.Module):
         loss_M = self.smooth_l1_loss_fn(H_gt[mask], H_hat_M[mask])
         loss_T = self.smooth_l1_loss_fn(H_gt[mask], H_hat_T[mask])
 
-        # print(f'{loss_M=}')
-        # print(f'{loss_T=}')
+        print(f'{loss_M=}')
+        print(f'{loss_T=}')
 
         return loss_M + loss_T
     
@@ -88,12 +88,12 @@ class CrossModalLosses(nn.Module):
         
         # Compute KL divergence loss
         kl_loss = self.kl_divergence_loss(dist_T, dist_M)
-        # print(f'{kl_loss=}')
+        print(f'{kl_loss=}')
 
         
         # Compute cross-modal embedding similarity loss
         embedding_similarity_loss = self.cross_modal_embedding_similarity_loss(z_t, z_m)
-        # print(f'{embedding_similarity_loss=}')
+        print(f'{embedding_similarity_loss=}')
 
         
         # Compute reconstruction loss
@@ -102,6 +102,6 @@ class CrossModalLosses(nn.Module):
         # Total loss = L_R + λ_KL * L_KL + λ_E * L_E
         total_loss = reconstruction_loss + self.lambda_kl * kl_loss + self.lambda_e * embedding_similarity_loss
         
-        # print(f'{total_loss=}\n')
+        print(f'{total_loss=}\n')
 
         return total_loss

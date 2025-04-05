@@ -34,10 +34,12 @@ checkpoint = torch.load(checkpoint_path, map_location=device)
 text_encoder.load_state_dict(checkpoint['text_encoder_state_dict'])
 motion_decoder.load_state_dict(checkpoint['motion_decoder_state_dict'])
 
+print(checkpoint['epoch'])
+
 print('loaded checkpoint')
 
 # text = input('Describe the desired action:')
-text = 'a person walks in circle'
+text = 'a man walks slowly backwards, stops, raises his hands quickly, then takes one step forward'
 print(text)
 
 start_time = time.time()
@@ -46,7 +48,7 @@ dist_T = text_encoder([text])
 z_T = dist_T.rsample()
 print(f'{z_T.shape=}')
 
-motion = motion_decoder(z_T, [15*40]).squeeze(0)
+motion = motion_decoder(z_T, [15*30]).squeeze(0)
 torch.save(motion, 'synthetic.pt')
 
 print(f'{motion.shape=}')

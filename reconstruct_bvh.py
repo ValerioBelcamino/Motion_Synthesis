@@ -21,21 +21,27 @@ def get_placeholder_values():
 
 def reconstruct_bvh(out_file_path):
 
-    # action_tensor = torch.load('./test_bvh/action_new.pt').squeeze(0)
-    # action_tensor = action_tensor[::2,:]
-    # action_tensor_split1 = action_tensor[:, :18*6+3]
-    # action_tensor_split2 = action_tensor[:, -19*6:-15*6]
-    # action_tensor = torch.cat((action_tensor_split1, action_tensor_split2), dim=1)
+    action_tensor = torch.load('./test_bvh/action.pt').squeeze(0)
 
-    action_tensor = torch.load('./synthetic.pt')
-    action_tensor = action_tensor.detach()
-    action_tensor = action_tensor.to('cpu')
-    print(action_tensor.shape)
+    noise = torch.randn_like(action_tensor, dtype=torch.float16) * 0.05
+    action_tensor += noise  # Apply noise
+
+    action_tensor = action_tensor[::2,:]
+    action_tensor[:, :3] = action_tensor[:, :3] / 100.0
+    action_tensor_split1 = action_tensor[:, :18*6+3]
+    action_tensor_split2 = action_tensor[:, -19*6:-15*6]
+    action_tensor = torch.cat((action_tensor_split1, action_tensor_split2), dim=1)
+
+    # action_tensor = torch.load('./synthetic.pt')
+    # action_tensor = action_tensor.detach()
+    # action_tensor = action_tensor.to('cpu')
+    # print(action_tensor.shape)
     # action_tensor_split1 = action_tensor[:, :18*6+3]
     # action_tensor_split2 = action_tensor[:, -19*6:-15*6]
 
     plch_vals = get_placeholder_values()
     plch_vals = plch_vals.unsqueeze(0).repeat(action_tensor.shape[0], 1)
+    plch_vals[:,:] = 0
 
     positions_tensor = action_tensor[:, :3] * 100
     print(positions_tensor.shape)
@@ -59,7 +65,7 @@ def reconstruct_bvh(out_file_path):
     anim_length = plch_vals.shape[0]
     print(f'Animation length: {anim_length}')
 
-    # orientations_6d_tensor = orientations_6d_tensor.reshape(anim_length, 52, 6)
+    orientations_6d_tensor = orientations_6d_tensor.reshape(anim_length, 52, 6)
     # print(orientations_6d_tensor.shape)
     orientations_6d_np = orientations_6d_tensor.reshape(anim_length, 52, 3, 2).to(torch.float64).numpy()
     print(orientations_6d_tensor.shape)

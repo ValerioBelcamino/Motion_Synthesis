@@ -32,7 +32,7 @@ class TensorTextDataset(Dataset):
         motion[:,:3] = motion[:,:3] / 100.0
 
         # downsample to save training time
-        motion = motion[::2,:]
+        # motion = motion[::2,:]
 
         current_size = motion.shape[0]
         # pad_amount = self.max_length_motion - current_size  # Only pad along dimension 1
@@ -50,6 +50,8 @@ class TensorTextDataset(Dataset):
 
         # Pick a random line from the text
         line = random.choice(text)
+
+        line = line.split('#')[0]
 
         return line[:-1]  # Remove the newline character
     
