@@ -34,7 +34,7 @@ print(f'{_max_len=}')
 
 print('Hello We Are Using the Last Version!!!')
 
-basepath = '/kaggle/input/motion/Motion_Synthesis_Dataset'
+basepath = '/kaggle/input/motion/dataset/dataset'
 motionpath = os.path.join(basepath, 'motion')
 
 # Checkpoint directory
