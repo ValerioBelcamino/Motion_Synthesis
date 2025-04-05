@@ -53,7 +53,7 @@ class TensorTextDataset(Dataset):
 
         line = line.split('#')[0]
 
-        return line[:-1]  # Remove the newline character
+        return line#[:-1]  # Remove the newline character
     
     def __getitem__(self, idx):
         motion, length = self.load_and_pad_torch(self.paths[idx])
