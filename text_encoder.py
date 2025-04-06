@@ -11,9 +11,9 @@ class TextEncoder(nn.Module):
     def __init__(self, pretrained_model: str = "distilbert-base-uncased",
                  finetune: bool = False,
                  vae: bool = True,
-                 latent_dim: int = 256,
+                 latent_dim: int = 384,
                  ff_size: int = 1024,
-                 num_layers: int = 6, num_heads: int = 4,
+                 num_layers: int = 6, num_heads: int = 6,
                  dropout: float = 0.1,
                  activation: str = "gelu") -> None:
         super().__init__()
