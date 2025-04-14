@@ -166,7 +166,7 @@ for e in range(start_epoch, n_epochs):
 
     avg_train_loss = total_train_loss / len(train_dataloader)
     print(f"Epoch {e} training loss: {avg_train_loss}")
-    print(f'{kl_loss=}, {embedding_similarity_loss=}, {reconstruction_loss=}')
+    print(f'{kl_loss.item()=}, {embedding_similarity_loss.item()=}, {reconstruction_loss.item()=}')
 
     # Save the model checkpoint if the validation loss improves
     if avg_train_loss < best_loss_train:
