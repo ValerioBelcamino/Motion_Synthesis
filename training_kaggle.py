@@ -155,7 +155,7 @@ for e in range(start_epoch, n_epochs):
         H_hat_T = motion_decoder(z_T, lengths)
         H_hat_M = motion_decoder(z_M, lengths)
 
-        loss = loss_function(dist_T, dist_M, z_T, z_M, motions, H_hat_T, H_hat_M, lengths)
+        loss, kl_loss, embedding_similarity_loss, reconstruction_loss = loss_function(dist_T, dist_M, z_T, z_M, motions, H_hat_T, H_hat_M, lengths)
         total_train_loss += loss.item()
 
         loss.backward()
@@ -166,6 +166,7 @@ for e in range(start_epoch, n_epochs):
 
     avg_train_loss = total_train_loss / len(train_dataloader)
     print(f"Epoch {e} training loss: {avg_train_loss}")
+    print(f'{kl_loss=}, {embedding_similarity_loss=}, {reconstruction_loss=}')
 
     # Save the model checkpoint if the validation loss improves
     if avg_train_loss < best_loss_train:
@@ -210,7 +211,7 @@ for e in range(start_epoch, n_epochs):
 
         avg_val_loss = total_val_loss / len(val_dataloader)
         print(f"Epoch {e}, validation loss: {avg_val_loss}")
-        print(f'{kl_loss=}, {embedding_similarity_loss=}, {reconstruction_loss=}')
+        
 
         # Save the model checkpoint if the validation loss improves
         if avg_val_loss < best_loss_val:
