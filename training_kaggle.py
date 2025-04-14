@@ -203,13 +203,14 @@ for e in range(start_epoch, n_epochs):
             H_hat_M = motion_decoder(z_M, lengths)
 
             # Calculate validation loss
-            loss = loss_function(dist_T, dist_M, z_T, z_M, motions, H_hat_T, H_hat_M, lengths)
+            loss, kl_loss, embedding_similarity_loss, reconstruction_loss = loss_function(dist_T, dist_M, z_T, z_M, motions, H_hat_T, H_hat_M, lengths)
             total_val_loss += loss.item()
 
             del motions, texts, lengths, dist_T, dist_M, z_T, z_M, H_hat_T, H_hat_M
 
         avg_val_loss = total_val_loss / len(val_dataloader)
         print(f"Epoch {e}, validation loss: {avg_val_loss}")
+        print(f'{kl_loss=}, {embedding_similarity_loss=}, {reconstruction_loss=}')
 
         # Save the model checkpoint if the validation loss improves
         if avg_val_loss < best_loss_val:

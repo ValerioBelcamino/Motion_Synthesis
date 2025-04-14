@@ -104,4 +104,4 @@ class CrossModalLosses(nn.Module):
         
         # print(f'{total_loss=}\n')
 
-        return total_loss
+        return total_loss, kl_loss, embedding_similarity_loss, reconstruction_loss
