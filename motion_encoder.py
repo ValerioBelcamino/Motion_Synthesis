@@ -18,8 +18,8 @@ def lengths_to_mask(lengths: List[int], device: torch.device) -> Tensor:
 
 class MotionEncoder(pl.LightningModule):
     def __init__(self, nfeats: int, max_len:int, vae: bool = True,
-                 latent_dim: int = 384, ff_size: int = 1024,
-                 num_layers: int = 6, num_heads: int = 6,
+                 latent_dim: int = 1024, ff_size: int = 1024,
+                 num_layers: int = 8, num_heads: int = 8,
                  dropout: float = 0.1,
                  activation: str = "gelu", **kwargs) -> None:
         super().__init__()
