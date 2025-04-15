@@ -7,6 +7,7 @@ class CrossModalLosses(nn.Module):
         super(CrossModalLosses, self).__init__()
         # Define the SmoothL1 loss for cross-modal similarity
         self.smooth_l1_loss_fn = nn.SmoothL1Loss(reduction='mean', beta=beta_kl)
+        self.smooth_l1_loss_fn_none = nn.SmoothL1Loss(reduction='none', beta=beta_kl)
         
         # Scaling factors for KL divergence and cross-modal similarity losses
         self.lambda_kl = lambda_kl
@@ -104,8 +105,8 @@ class CrossModalLosses(nn.Module):
         mask = mask.unsqueeze(-1).expand_as(H_gt)  # (batch_size, seq_len, dim)
 
         # Compute unreduced Smooth L1 loss
-        loss_M = self.smooth_l1_loss_fn(H_hat_M, H_gt, reduction='none')
-        loss_T = self.smooth_l1_loss_fn(H_hat_T, H_gt, reduction='none')
+        loss_M = self.smooth_l1_loss_fn_none(H_hat_M, H_gt, reduction='none')
+        loss_T = self.smooth_l1_loss_fn_none(H_hat_T, H_gt, reduction='none')
 
         # print(loss_M + loss_T)
         # print((loss_M + loss_T).shape)

@@ -61,6 +61,8 @@ for f in fnames:
 fnames = newfnames
 print(len(fnames))
 
+fnames = fnames[-500:]
+
 # Let's split in train and test
 
 # First, split into train (80%) and temp (20%) (test + validation)
