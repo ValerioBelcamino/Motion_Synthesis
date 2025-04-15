@@ -83,6 +83,39 @@ class CrossModalLosses(nn.Module):
 
         return loss_M + loss_T
     
+    def reconstruction_loss1(self, H_gt, H_hat_M, H_hat_T, lengths):
+        """
+        Compute reconstruction loss using element-wise Smooth L1 loss,
+        masking out the padded regions based on sequence lengths.
+
+        Args:
+            H_gt (Tensor): Ground truth tensor (batch_size, seq_len, dim)
+            H_hat_M (Tensor): Predicted output from model M (same shape)
+            H_hat_T (Tensor): Predicted output from model T (same shape)
+            lengths (List[int] or Tensor): Lengths of valid sequences in the batch
+
+        Returns:
+            Tensor: Scalar loss value (sum of masked losses from M and T)
+        """
+        lengths = torch.as_tensor(lengths, device=H_gt.device)
+
+        # Create a mask for valid time steps (batch_size, seq_len, 1)
+        mask = torch.arange(H_gt.size(1), device=H_gt.device).unsqueeze(0) < lengths.unsqueeze(1)
+        mask = mask.unsqueeze(-1).expand_as(H_gt)  # (batch_size, seq_len, dim)
+
+        # Compute unreduced Smooth L1 loss
+        loss_M = self.smooth_l1_loss_fn(H_hat_M, H_gt, reduction='none')
+        loss_T = self.smooth_l1_loss_fn(H_hat_T, H_gt, reduction='none')
+
+        # print(loss_M + loss_T)
+        # print((loss_M + loss_T).shape)
+
+        # Apply mask and compute mean loss over valid elements
+        masked_loss_M = loss_M[mask].mean()
+        masked_loss_T = loss_T[mask].mean()
+
+        return masked_loss_M + masked_loss_T
+    
     def forward(self, dist_T, dist_M, z_t, z_m, H_gt, H_hat_T, H_hat_M, lengths):
         """Compute the total loss including KL divergence, cross-modal similarity, and reconstruction."""
         
@@ -97,7 +130,7 @@ class CrossModalLosses(nn.Module):
 
         
         # Compute reconstruction loss
-        reconstruction_loss = self.reconstruction_loss(H_gt, H_hat_T, H_hat_M, lengths)
+        reconstruction_loss = self.reconstruction_loss1(H_gt, H_hat_T, H_hat_M, lengths)
         
         # Total loss = L_R + λ_KL * L_KL + λ_E * L_E
         total_loss = reconstruction_loss + self.lambda_kl * kl_loss + self.lambda_e * embedding_similarity_loss
