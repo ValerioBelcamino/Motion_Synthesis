@@ -22,7 +22,7 @@ batch_size = 32
 
 n_features = 135
 
-_max_len = 300
+_max_len = 220
 
 print(f'{learning_rate=}')
 print(f'{n_epochs=}')

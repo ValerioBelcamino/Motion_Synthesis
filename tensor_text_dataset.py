@@ -29,7 +29,7 @@ class TensorTextDataset(Dataset):
         motion = torch.cat((motion_split1, motion_split2), dim=1)
 
         # scale root location to be in a smaller range
-        motion[:,:3] = motion[:,:3] / 100.0
+        motion[:,:3] = motion[:,:3] / 1000.0
 
         # downsample to save training time
         # motion = motion[::2,:]
