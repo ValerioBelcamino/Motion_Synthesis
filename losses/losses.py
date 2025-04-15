@@ -105,8 +105,8 @@ class CrossModalLosses(nn.Module):
         mask = mask.unsqueeze(-1).expand_as(H_gt)  # (batch_size, seq_len, dim)
 
         # Compute unreduced Smooth L1 loss
-        loss_M = self.smooth_l1_loss_fn_none(H_hat_M, H_gt, reduction='none')
-        loss_T = self.smooth_l1_loss_fn_none(H_hat_T, H_gt, reduction='none')
+        loss_M = self.smooth_l1_loss_fn_none(H_hat_M, H_gt)
+        loss_T = self.smooth_l1_loss_fn_none(H_hat_T, H_gt)
 
         # print(loss_M + loss_T)
         # print((loss_M + loss_T).shape)
