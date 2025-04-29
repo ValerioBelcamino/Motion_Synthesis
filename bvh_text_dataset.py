@@ -43,16 +43,20 @@ class BVHTextDataset(Dataset):
         bvh = BVH()
         bvh.load(path)
         local_rotations, world_positions, _, _, _, _ = bvh.get_data()
-        continuous_rotations = sixd.from_quat(torch.from_numpy(local_rotations))
+        # continuous_rotations = sixd.from_quat(torch.from_numpy(local_rotations))
+        continuous_rotations = local_rotations
         # print(continuous_rotations.shape)
         # print(continuous_rotations.dtype)
         # continuous_rotations = sixd.to_quat(continuous_rotations)
         # print(continuous_rotations.shape)
         # print(continuous_rotations.dtype)
         # exit()
-        dim1, dim2, _, _ = continuous_rotations.shape
-        continuous_rotations = continuous_rotations.reshape(dim1, dim2, 6)
-        continuous_rotations = continuous_rotations.reshape(dim1, dim2*6)
+        # print(continuous_rotations.shape)
+        dim1, dim2, _ = continuous_rotations.shape
+        continuous_rotations = continuous_rotations.reshape(dim1, dim2*4)
+        
+        # continuous_rotations = continuous_rotations.reshape(dim1, dim2, 6)
+        # continuous_rotations = continuous_rotations.reshape(dim1, dim2*6)
 
         world_positions = world_positions[:,0,:]
 
@@ -77,6 +81,7 @@ class BVHTextDataset(Dataset):
 
         multiplier = dataset_fps / 20.0
         print(f'{multiplier=}, {int(multiplier)=}')
+
 
         if dataset_name == 'HDM05':
             print(f'removing {int(3*20*multiplier)} first samples')
@@ -124,7 +129,7 @@ class BVHTextDataset(Dataset):
         if abs(motion_data.shape[0] - lung) > 5:
             print(abs(motion_data.shape[0] - lung))
             print(lung)
-            input('khggiy')
+            # input('khggiy')
         # if motion_data.shape[0]<10:
         #     input('khggiy')
         return motion_data, path  # Convert motion data to tensor

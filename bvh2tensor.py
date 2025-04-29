@@ -75,12 +75,16 @@ for bvh in bvh_files:
 print(f'\nFound {len(bvh_with_idx)} bvh files with idx')
 print(f'Missed {len(missed)} bvh files with idx')
 
+new_bvh_with_idx = []
+for fff in bvh_with_idx:
+    if 'KIT' not in fff:
+        continue
+    new_bvh_with_idx.append(fff)
 # print(missed)
 
-# exit()
+print(f'\nFound {len(new_bvh_with_idx)} bvh files with idx')
 
-
-dataset = BVHTextDataset(bvh_with_idx, descriptions, max_length=128)
+dataset = BVHTextDataset(new_bvh_with_idx, descriptions, max_length=128)
 dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
 motion_length = 0
