@@ -117,6 +117,27 @@ class CrossModalLosses(nn.Module):
 
         return masked_loss_M + masked_loss_T
     
+    def reconstruction_loss2(self, H_gt, H_hat_M, H_hat_T, lengths):
+        # H_gt, H_hat_M, H_hat_T: [B, T, F]
+        B, T, F = H_gt.shape
+        mask = torch.arange(T, device=H_gt.device).unsqueeze(0) < torch.tensor(lengths, device=H_gt.device).unsqueeze(1)
+        mask = mask.unsqueeze(-1).expand(-1, -1, F)  # [B, T, F]
+
+        # Use reduction='none' so we control averaging
+        loss_fn = nn.SmoothL1Loss(reduction='none', beta=self.smooth_l1_loss_fn.beta)
+        loss_M = loss_fn(H_hat_M, H_gt)
+        loss_T = loss_fn(H_hat_T, H_gt)
+
+        # Apply mask
+        loss_M = loss_M * mask
+        loss_T = loss_T * mask
+
+        # Normalize by number of valid elements
+        num_valid = mask.sum()
+        loss = (loss_M.sum() + loss_T.sum()) / num_valid.clamp(min=1)
+
+        return loss
+    
     def forward(self, dist_T, dist_M, z_t, z_m, H_gt, H_hat_T, H_hat_M, lengths):
         """Compute the total loss including KL divergence, cross-modal similarity, and reconstruction."""
         
@@ -131,7 +152,7 @@ class CrossModalLosses(nn.Module):
 
         
         # Compute reconstruction loss
-        reconstruction_loss = self.reconstruction_loss1(H_gt, H_hat_T, H_hat_M, lengths)
+        reconstruction_loss = self.reconstruction_loss2(H_gt, H_hat_T, H_hat_M, lengths)
         
         # Total loss = L_R + λ_KL * L_KL + λ_E * L_E
         total_loss = reconstruction_loss + self.lambda_kl * kl_loss + self.lambda_e * embedding_similarity_loss

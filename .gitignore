@@ -3,3 +3,5 @@ __pycache__/
 *.pt
 *.pth
 test_bvh
+!mean.pt
+!std.pt
