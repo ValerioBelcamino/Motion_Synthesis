@@ -9,8 +9,8 @@ class TensorTextDataset(Dataset):
         self.paths = paths
         self.max_length_motion = max_length_motion
         self.base_path = base_path
-        self.mean = torch.load('mean.pt').to('cpu')
-        self.std = torch.load('std.pt').to('cpu')
+        self.mean = torch.load('/kaggle/working/Motion_Synthesis/mean.pt').to('cpu')
+        self.std = torch.load('/kaggle/working/Motion_Synthesis/std.pt').to('cpu')
         print(f'loaded with {self.mean.shape}')
         print(f'loaded with {self.std.shape}')
 
