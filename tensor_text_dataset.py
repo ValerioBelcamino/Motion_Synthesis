@@ -9,10 +9,10 @@ class TensorTextDataset(Dataset):
         self.paths = paths
         self.max_length_motion = max_length_motion
         self.base_path = base_path
-        self.mean = torch.load('/kaggle/working/Motion_Synthesis/mean.pt').to('cpu')
-        self.std = torch.load('/kaggle/working/Motion_Synthesis/std.pt').to('cpu')
-        print(f'loaded with {self.mean.shape}')
-        print(f'loaded with {self.std.shape}')
+        # self.mean = torch.load('/kaggle/working/Motion_Synthesis/mean.pt').to('cpu')
+        # self.std = torch.load('/kaggle/working/Motion_Synthesis/std.pt').to('cpu')
+        # print(f'loaded with {self.mean.shape}')
+        # print(f'loaded with {self.std.shape}')
 
     def __len__(self):
         return len(self.paths)
@@ -35,7 +35,7 @@ class TensorTextDataset(Dataset):
         # scale root location to be in a smaller range
         motion[:,:3] = motion[:,:3] / 1000.0
 
-        motion =(motion - self.mean) / self.std
+        # motion =(motion - self.mean) / self.std
 
         # downsample to save training time
         # motion = motion[::2,:]
@@ -55,8 +55,8 @@ class TensorTextDataset(Dataset):
             text = f.readlines()
 
         # Pick a random line from the text
-        # line = random.choice(text)
-        line = text[0]
+        line = random.choice(text)
+        # line = text[0]        
 
         line = line.split('#')[0]
 

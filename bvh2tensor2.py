@@ -102,8 +102,8 @@ print(f'Missed {len(missed)} bvh files with idx')
 
 new_bvh_with_idx = []
 for fff in bvh_with_idx:
-    if 'KIT' not in fff:
-        continue
+    # if 'KIT' not in fff:
+    #     continue
     new_bvh_with_idx.append(fff)
 # print(missed)
 

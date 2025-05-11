@@ -3,6 +3,25 @@ from torch.utils.data import Dataset
 from pymotion.io.bvh import BVH
 import pymotion.rotations.ortho6d as sixd
 import random
+import numpy as np
+
+def quat_inverse(q):
+    q_conj = np.array([-q[0], -q[1], -q[2], q[3]])  # Negate vector part
+    norm_sq = np.dot(q, q)
+    return q_conj / norm_sq
+
+
+def quat_mul(q1, q2):
+    # Multiply two quaternions: q1 * q2
+    x1, y1, z1, w1 = q1
+    x2, y2, z2, w2 = q2
+    return np.array([
+        w1*x2 + x1*w2 + y1*z2 - z1*y2,
+        w1*y2 - x1*z2 + y1*w2 + z1*x2,
+        w1*z2 + x1*y2 - y1*x2 + z1*w2,
+        w1*w2 - x1*x2 - y1*y2 - z1*z2
+    ])
+
 
 class BVHTextDataset(Dataset):
     def __init__(self, bvh_paths, txt_paths, cutting_len, max_length=128):
@@ -43,8 +62,13 @@ class BVHTextDataset(Dataset):
         bvh = BVH()
         bvh.load(path)
         local_rotations, world_positions, _, _, _, _ = bvh.get_data()
-        # continuous_rotations = sixd.from_quat(torch.from_numpy(local_rotations))
-        continuous_rotations = local_rotations
+        root_rot_ref = quat_inverse(local_rotations[0,0,:])
+
+        for t in range(local_rotations.shape[0]):
+            local_rotations[t, 0] = quat_mul(root_rot_ref, local_rotations[t, 0])
+        continuous_rotations = sixd.from_quat(torch.from_numpy(local_rotations))
+        # print(continuous_rotations.shape)
+        # continuous_rotations = local_rotations
         # print(continuous_rotations.shape)
         # print(continuous_rotations.dtype)
         # continuous_rotations = sixd.to_quat(continuous_rotations)
@@ -52,13 +76,14 @@ class BVHTextDataset(Dataset):
         # print(continuous_rotations.dtype)
         # exit()
         # print(continuous_rotations.shape)
-        dim1, dim2, _ = continuous_rotations.shape
-        continuous_rotations = continuous_rotations.reshape(dim1, dim2*4)
+        dim1, dim2, _, _ = continuous_rotations.shape
+        # continuous_rotations = continuous_rotations.reshape(dim1, dim2*4)
         
-        # continuous_rotations = continuous_rotations.reshape(dim1, dim2, 6)
-        # continuous_rotations = continuous_rotations.reshape(dim1, dim2*6)
+        continuous_rotations = continuous_rotations.reshape(dim1, dim2, 6)
+        continuous_rotations = continuous_rotations.reshape(dim1, dim2*6)
 
         world_positions = world_positions[:,0,:]
+        world_positions = world_positions - world_positions[0]
 
         continuous_rotations_tensor = torch.from_numpy(continuous_rotations)
         world_positions_tensor = torch.from_numpy(world_positions)
@@ -114,7 +139,7 @@ class BVHTextDataset(Dataset):
             print('ciao')
             end = motion_data.shape[0]
             print(end)
-            input('khggiy')
+            # input('khggiy')
 
         # print(motion_data.shape)
 
