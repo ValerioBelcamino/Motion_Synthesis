@@ -30,7 +30,7 @@ print(f'{_max_len=}')
 
 print('Hello We Are Using the Last Version!!!')
 
-basepath = '/home/belca/Desktop/Motion_Synthesis_Dataset'
+basepath = '/home/belca/Desktop/Motion_Synthesis/dataset'
 motionpath = os.path.join(basepath, 'motion')
 
 # Checkpoint directory
