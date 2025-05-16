@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.distributions as dist
 
 class CrossModalLosses(nn.Module):
-    def __init__(self, lambda_kl=1e-7, lambda_e=1e-5, beta_kl=1.0):
+    def __init__(self, lambda_kl=1e-5, lambda_e=1e-5, beta_kl=1.0):
         super(CrossModalLosses, self).__init__()
         # Define the SmoothL1 loss for cross-modal similarity
         self.smooth_l1_loss_fn = nn.SmoothL1Loss(reduction='mean', beta=beta_kl)
@@ -134,7 +134,7 @@ class CrossModalLosses(nn.Module):
 
         # Normalize by number of valid elements
         num_valid = mask.sum()
-        loss = (loss_M.sum() + loss_T.sum()) / num_valid.clamp(min=1)
+        loss = (loss_M.sum() + loss_T.sum())# / num_valid.clamp(min=1)
 
         return loss
     
