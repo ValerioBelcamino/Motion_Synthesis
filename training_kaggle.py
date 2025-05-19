@@ -92,11 +92,11 @@ train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-motion_encoder = MotionEncoder(nfeats=n_features, max_len=_max_len, num_heads=6, num_layers=6, latent_dim=360).to(device)
+motion_encoder = MotionEncoder(nfeats=n_features, max_len=_max_len, num_heads=8, num_layers=8, latent_dim=256).to(device)
 print('Created motion encoder')
-text_encoder = TextEncoder(num_heads=6, num_layers=6, latent_dim=360).to(device)
+text_encoder = TextEncoder(num_heads=8, num_layers=8, latent_dim=256).to(device)
 print('Created text encoder')
-motion_decoder = MotionDecoder(n_features, max_len=_max_len, num_heads=6, num_layers=6, latent_dim=360).to(device)
+motion_decoder = MotionDecoder(n_features, max_len=_max_len, num_heads=8, num_layers=8, latent_dim=256).to(device)
 print('Created motion decoder\n')
 
 optimizer = torch.optim.AdamW(list(motion_encoder.parameters()) +
